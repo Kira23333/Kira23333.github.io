@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>DGP Homework1</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	</head>
+	<body ontouchstart="">
+		<link href="css/main.css" rel="stylesheet" />
+		<link id="theme" href="css/light.css" rel="stylesheet" />
+		<script src="js/libs/three.min.js"></script>
+		<script src="js/libs/ui.js"></script>
+		<script src="js/libs/ui.three.js"></script>
+		<script src="js/libs/signals.min.js"></script>
+		<script src="js/libs/system.min.js"></script>
+
+
+		<script src="js/libs/renderers/CanvasRenderer.js"></script>
+		<script src="js/libs/renderers/RaytracingRenderer.js"></script>
+		<script src="js/libs/renderers/SoftwareRenderer.js"></script>
+		<script src="js/libs/renderers/SVGRenderer.js"></script>
+
+		<script src="js/libs/controls/TransformControls.js"></script>
+		<script src="js/libs/controls/EditorControls.js"></script>
+
+		<script src="js/Editor.js"></script>
+		<script src="js/Sidebar.js"></script>
+		<script src="js/Menubar.js"></script>
+		<script src="js/Toolbar.js"></script>
+		<script src="js/Loader.js"></script>
+		<script src="js/Config.js"></script>
+		<script src="js/Viewport.js"></script>
+		<script src="js/Viewport.Info.js"></script>
+
+
+		<script>
+			window.URL = window.URL || window.webkitURL;
+			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+
+			var editor = new Editor();
+
+			var viewport = new Viewport( editor );	
+			document.body.appendChild( viewport.dom );
+
+			var menubar = new Menubar( editor );
+			document.body.appendChild( menubar.dom );
+
+			var toolbar = new Toolbar( editor );
+			document.body.appendChild( toolbar.dom );
+
+			var sidebar = new Sidebar( editor );
+			document.body.appendChild( sidebar.dom );
+
+			editor.createRenderer( editor.config.getKey( 'project/renderer' ), editor.config.getKey( 'project/renderer/antialias' ), editor.config.getKey( 'project/renderer/shadows' ), editor.config.getKey( 'project/renderer/gammaInput' ), editor.config.getKey( 'project/renderer/gammaOutput' ) );
+
+			document.addEventListener( 'dragover', function ( event ) {
+
+				event.preventDefault();
+				event.dataTransfer.dropEffect = 'copy';
+
+			}, false );
+
+			document.addEventListener( 'drop', function ( event ) {
+
+				event.preventDefault();
+
+				if ( event.dataTransfer.files.length > 0 ) {
+
+					editor.loader.loadFile( event.dataTransfer.files[ 0 ] );
+
+				}
+
+			}, false );
+
+			document.addEventListener( 'keydown', function ( event ) {
+
+				switch ( event.keyCode ) {
+
+					case 8: // backspace
+
+						event.preventDefault(); // prevent browser back
+
+					case 46: // delete
+
+						var object = editor.selected;
+
+						if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
+
+						var parent = object.parent;
+						if ( parent !== null ) editor.execute( new RemoveObjectCommand( object ) );
+
+						break;
+
+					case 90: // Register Ctrl-Z for Undo, Ctrl-Shift-Z for Redo
+
+						if ( event.ctrlKey && event.shiftKey ) {
+
+							editor.redo();
+
+						} else if ( event.ctrlKey ) {
+
+							editor.undo();
+
+						}
+
+						break;
+
+					case 87: // Register W for translation transform mode
+
+						editor.signals.transformModeChanged.dispatch( 'translate' );
+
+						break;
+
+					case 69: // Register E for rotation transform mode
+
+						editor.signals.transformModeChanged.dispatch( 'rotate' );
+
+						break;
+
+					case 82: // Register R for scaling transform mode
+
+						editor.signals.transformModeChanged.dispatch( 'scale' );
+
+						break;
+
+				}
+
+			}, false );
+
+			function onWindowResize( event ) {
+
+				editor.signals.windowResize.dispatch();
+
+			}
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+			onWindowResize();
+
+		</script>
+	</body>
+</html>
