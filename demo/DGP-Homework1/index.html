@@ -13,6 +13,8 @@
 		<script src="js/libs/ui.three.js"></script>
 		<script src="js/libs/signals.min.js"></script>
 		<script src="js/libs/system.min.js"></script>
+		<script src="js/libs/numeric-1.2.6.min.js"></script>
+		<script src="js/libs/kdTree.js"></script>
 
 
 		<script src="js/libs/renderers/CanvasRenderer.js"></script>
@@ -25,21 +27,40 @@
 
 		<script src="js/Editor.js"></script>
 		<script src="js/Sidebar.js"></script>
+		<script src="js/Sidebar.Basic.js"></script>
+		<script src="js/Sidebar.Advanced.js"></script>
 		<script src="js/Menubar.js"></script>
 		<script src="js/Toolbar.js"></script>
 		<script src="js/Loader.js"></script>
 		<script src="js/Config.js"></script>
+		<script src="js/History.js"></script>
+		<script src="js/Command.js"></script>
 		<script src="js/Viewport.js"></script>
 		<script src="js/Viewport.Info.js"></script>
+		<script src="js/OBJLoader.js"></script>
+		<script src="js/OFFLoader.js"></script>
+		<script src="js/ICP.js"></script>
+
+		<script src="js/Command.js"></script>
+		<script src="js/commands/AddObjectCommand.js"></script>
+		<script src="js/commands/RemoveObjectCommand.js"></script>
+		<script src="js/commands/SetPositionCommand.js"></script>
+		<script src="js/commands/SetRotationCommand.js"></script>
+		<script src="js/commands/SetScaleCommand.js"></script>
+		<script src="js/commands/SetValueCommand.js"></script>
 
 
 		<script>
 			window.URL = window.URL || window.webkitURL;
 			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
 
+			Number.prototype.format = function (){
+				return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+			};
+
 			var editor = new Editor();
 
-			var viewport = new Viewport( editor );	
+			var viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );
 
 			var menubar = new Menubar( editor );
@@ -136,6 +157,8 @@
 			window.addEventListener( 'resize', onWindowResize, false );
 
 			onWindowResize();
+
+
 
 		</script>
 	</body>

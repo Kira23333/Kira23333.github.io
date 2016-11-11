@@ -26,17 +26,19 @@ var Sidebar = function ( editor ) {
 
 	//
 
-	var basic = new UI.Span().add(
-		
+	var basic = new UI.Span();
+	basic.add(
+		new Sidebar.Basic(editor)
 	);
 	container.add( basic );
 
-	var advanced = new UI.Span().add(
-		
+	var advanced = new UI.Span();
+	advanced.add(
+		new Sidebar.Advanced(editor)
 	);
 	container.add( advanced );
 
-	
+
 	//
 
 	function select( section ) {

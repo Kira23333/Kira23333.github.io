@@ -168,6 +168,11 @@ input.Number {
 		min-height: 20px;
 		margin-bottom: 10px;
 	}
+	#sidebar .Row .button{
+		cursor = 'pointer';
+		marginRight = '5px';
+		border = '1px solid #888';
+	}
 
 #tabs {
 	background-color: #ddd;

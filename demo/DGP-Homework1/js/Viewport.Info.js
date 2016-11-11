@@ -16,11 +16,13 @@ Viewport.Info = function ( editor ) {
 
 	var objectsText = new UI.Text( '0' ).setMarginLeft( '6px' );
 	var verticesText = new UI.Text( '0' ).setMarginLeft( '6px' );
-	var trianglesText = new UI.Text( '0' ).setMarginLeft( '6px' );
+	var facesText = new UI.Text( '0' ).setMarginLeft( '6px' );
+	var edgesText = new UI.Text( '0' ).setMarginLeft( '6px' );
 
 	container.add( new UI.Text( 'objects' ), objectsText, new UI.Break() );
 	container.add( new UI.Text( 'vertices' ), verticesText, new UI.Break() );
-	container.add( new UI.Text( 'triangles' ), trianglesText, new UI.Break() );
+	container.add( new UI.Text( 'faces' ), facesText, new UI.Break() );
+	container.add( new UI.Text( 'edges' ), edgesText, new UI.Break() );
 
 	signals.objectAdded.add( update );
 	signals.objectRemoved.add( update );
@@ -32,7 +34,7 @@ Viewport.Info = function ( editor ) {
 
 		var scene = editor.scene;
 
-		var objects = 0, vertices = 0, triangles = 0;
+		var objects = 0, vertices = 0, faces = 0, edges = 0;
 
 		for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
 
@@ -40,29 +42,30 @@ Viewport.Info = function ( editor ) {
 
 			object.traverseVisible( function ( object ) {
 
-				objects ++;
-
+				
 				if ( object instanceof THREE.Mesh ) {
+					objects ++;
 
 					var geometry = object.geometry;
 
 					if ( geometry instanceof THREE.Geometry ) {
 
 						vertices += geometry.vertices.length;
-						triangles += geometry.faces.length;
+						faces += geometry.faces.length;
+						edges += geometry.faces.length * 3;
 
 					} else if ( geometry instanceof THREE.BufferGeometry ) {
 
 						if ( geometry.index !== null ) {
 
 							vertices += geometry.index.count * 3;
-							triangles += geometry.index.count;
-
+							faces += geometry.index.count;
+							edges += geometry.index.count * 3;
 						} else {
 
 							vertices += geometry.attributes.position.count;
-							triangles += geometry.attributes.position.count / 3;
-
+							faces += geometry.attributes.position.count / 3;
+							edges += geometry.attributes.position.count;
 						}
 
 					}
@@ -75,8 +78,8 @@ Viewport.Info = function ( editor ) {
 
 		objectsText.setValue( objects.format() );
 		verticesText.setValue( vertices.format() );
-		trianglesText.setValue( triangles.format() );
-
+		facesText.setValue( faces.format() );
+		edgesText.setValue( (edges/2).format() );
 	}
 
 	return container;

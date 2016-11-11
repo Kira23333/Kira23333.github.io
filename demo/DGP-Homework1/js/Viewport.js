@@ -22,6 +22,7 @@ var Viewport = function ( editor ) {
 	var sceneHelpers = editor.sceneHelpers;
 
 	var objects = [];
+	var cubeSize = 0.002;
 
 	//
 
@@ -275,8 +276,452 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	
+	var currentDisplayType = null;
+	signals.objDisplayChanged.add( function ( displayType ) {
+		editor.clearResult();
+		if (editor.color === false) {
+			alert("Color file has not loaded");
+			return;
+		}
+		if ( currentDisplayType !== displayType ) {
 
+			currentFogType = displayType;
+
+			var scene = editor.scene;
+
+			for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
+
+				var object = scene.children[ i ];
+
+				object.traverseVisible( function ( object ) {
+
+					if ( object instanceof THREE.Mesh ) {
+						object.visible =false;
+
+					}
+
+				} );
+
+
+			}
+			switch ( displayType ) {
+
+				case 'Default':
+					scene.children[1].children[0].visible = true;
+					break;
+				case 'Continuous':
+					scene.children[2].visible = true;
+					break;
+				case 'Discrete':
+					scene.children[3].visible = true;
+					break;
+
+			}
+		}
+
+
+		render();
+
+	} );
+
+
+	signals.findAdjOfFace.add( function ( id ) {
+		var index = parseInt( id ) - 1;
+		if (isNaN(index)) {
+			alert("It's not a number");
+			return;
+		}
+		editor.clearResult();
+		var scene = editor.scene;
+
+		for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
+
+			var object = scene.children[ i ];
+
+
+			object.traverse( function ( object ) {
+
+				if ( object instanceof THREE.Mesh ) {
+					geometry = object.geometry;
+					if (geometry instanceof THREE.BufferGeometry) {
+						object.visible = false;
+					}
+					else if (geometry instanceof THREE.Geometry){
+						object.visible = true;
+						var adjFaceColor = 0x0000ff;
+						var farFaceColor = 0xffffff;
+						var selFaceColor = 0xff0000;
+						var f = geometry.faces[index];
+						if (f.color === undefined) {
+							f.color = new THREE.Color(selFaceColor);
+						}
+						else {
+							f.color.setHex(selFaceColor);
+						}
+						//if (v === undefined) {return};
+						function isAdj( face1, face2 ) {
+							var commonVertex = 0;
+							if (face1.a == face2.a) commonVertex++;
+							if (face1.a == face2.b) commonVertex++;
+							if (face1.a == face2.c) commonVertex++;
+							if (face1.b == face2.a) commonVertex++;
+							if (face1.b == face2.b) commonVertex++;
+							if (face1.b == face2.c) commonVertex++;
+							if (face1.c == face2.a) commonVertex++;
+							if (face1.c == face2.b) commonVertex++;
+							if (face1.c == face2.c) commonVertex++;
+							if (commonVertex == 2) return true; else return false;
+						}
+						for (var i = 0; i < geometry.faces.length; i++) {
+							if (i === index) continue;
+							face = geometry.faces[i];
+							if (isAdj(f, face)) {
+								if (face.color === undefined) {
+									face.color = new THREE.Color(adjFaceColor);
+								}
+								else {
+									face.color.setHex(adjFaceColor);
+								}
+							}
+							else if (face.color === undefined) {
+								face.color = new THREE.Color(farFaceColor);
+							}
+							else {
+								face.color.setHex(farFaceColor);
+							}
+						}
+						geometry.colorsNeedUpdate = true;
+					}
+				}
+			} );
+		}
+
+		render();
+	});
+
+	signals.findAdjOfVertex.add( function ( id ) {
+		var index = parseInt( id ) - 1;
+		if (isNaN(index)) {
+			alert("It's not a number");
+			return;
+		}
+		editor.clearResult();
+		var scene = editor.scene;
+
+		for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
+
+			var object = scene.children[ i ];
+
+
+			object.traverse( function ( object ) {
+
+				if ( object instanceof THREE.Mesh ) {
+					geometry = object.geometry;
+					if (geometry instanceof THREE.BufferGeometry) {
+						object.visible = false;
+					}
+					else if (geometry instanceof THREE.Geometry){
+						object.visible = true;
+						var adjVertex = new Set();
+						var adjFaceColor = 0x0000ff;
+						var farFaceColor = 0xffffff;
+						var v = geometry.vertices[index];
+						//if (v === undefined) {return};
+						for (var i = 0; i < geometry.faces.length; i++) {
+							face = geometry.faces[i];
+							if (index === face.a || index === face.b || index ===face.c) {
+								if (index !== face.a) adjVertex.add(geometry.vertices[face.a]);
+								if (index !== face.b) adjVertex.add(geometry.vertices[face.b]);
+								if (index !== face.c) adjVertex.add(geometry.vertices[face.c]);
+								if (face.color === undefined) {
+									face.color = new THREE.Color(adjFaceColor);
+								}
+								else {
+									face.color.setHex(adjFaceColor);
+								}
+							}
+							else if (face.color === undefined) {
+								face.color = new THREE.Color(farFaceColor);
+							}
+							else {
+								face.color.setHex(farFaceColor);
+							}
+						}
+						geometry.colorsNeedUpdate = true;
+						var boxgeometry = new THREE.BoxGeometry( cubeSize, cubeSize, cubeSize );
+						var material = new THREE.MeshBasicMaterial( {color: 0xff0000} );
+						var cube = new THREE.Mesh( boxgeometry, material );
+
+						cube.translateX ( v.x );
+						cube.translateY ( v.y );
+						cube.translateZ ( v.z );
+						editor.result[cube.uuid] = cube;
+						scene.add( cube );
+						adjVertex.forEach(function ( vertex ){
+							var geometry = new THREE.BoxGeometry( cubeSize, cubeSize, cubeSize );
+							var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+							var cube = new THREE.Mesh( geometry, material );
+							cube.translateX ( vertex.x );
+							cube.translateY ( vertex.y );
+							cube.translateZ ( vertex.z );
+							editor.result[cube.uuid] = cube;
+							scene.add( cube );
+						});
+					}
+				}
+			} );
+		}
+
+		render();
+	});
+
+	signals.findNormalOfFace.add( function ( id ) {
+		var index = parseInt( id ) - 1;
+		if (isNaN(index)) {
+			alert("It's not a number");
+			return;
+		}
+		editor.clearResult();
+		var scene = editor.scene;
+
+		for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
+
+			var object = scene.children[ i ];
+
+
+			object.traverse( function ( object ) {
+
+				if ( object instanceof THREE.Mesh ) {
+					geometry = object.geometry;
+					if (geometry instanceof THREE.BufferGeometry) {
+						object.visible = false;
+					}
+					else if (geometry instanceof THREE.Geometry){
+						object.visible = true;
+						var f = geometry.faces[index];
+						var a = geometry.vertices[f.a], b = geometry.vertices[f.b], c = geometry.vertices[f.c];
+						var v = new THREE.Vector3((a.x + b.x + c.x)/3, (a.y + b.y + c.y)/3, (a.z + b.z + c.z)/3);
+						var n = f.normal;
+						geometry.colorsNeedUpdate = true;
+						var cylinderGeometry = new THREE.CylinderGeometry( 0.001, 0.001, 0.1, 4);
+						var material = new THREE.MeshBasicMaterial( {color: 0x00ffff} );
+						var cylinder = new THREE.Mesh( cylinderGeometry, material );
+
+
+						cylinder.translateX ( v.x );
+						cylinder.translateY ( v.y );
+						cylinder.translateZ ( v.z );
+						cylinder.rotateX(Math.asin(n.z));
+						cylinder.rotateZ(Math.asin(-n.x/Math.sqrt(1 - n.z * n.z)));
+						console.log(v);
+						editor.result[cylinder.uuid] = cylinder;
+						scene.add( cylinder );
+
+
+						var adjFaceColor = 0x0000ff;
+						var farFaceColor = 0xffffff;
+						var selFaceColor = 0xff0000;
+						if (f.color === undefined) {
+							f.color = new THREE.Color(selFaceColor);
+						}
+						else {
+							f.color.setHex(selFaceColor);
+						}
+						for (var i = 0; i < geometry.faces.length; i++) {
+							if (i === index) continue;
+							face = geometry.faces[i];
+							if (face.color === undefined) {
+								face.color = new THREE.Color(farFaceColor);
+							}
+							else {
+								face.color.setHex(farFaceColor);
+							}
+						}
+						geometry.colorsNeedUpdate = true;
+					}
+				}
+			} );
+		}
+
+		render();
+	});
+
+	signals.showRegionStrict.add( function ( text ) {
+		try {
+
+			var list = JSON.parse( text );
+			var set = new Set(list);
+
+			editor.clearResult();
+			var scene = editor.scene;
+
+			for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
+
+				var object = scene.children[ i ];
+
+
+				object.traverse( function ( object ) {
+
+					if ( object instanceof THREE.Mesh ) {
+						geometry = object.geometry;
+						if (geometry instanceof THREE.BufferGeometry) {
+							object.visible = false;
+						}
+						else if (geometry instanceof THREE.Geometry){
+							object.visible = true;
+
+							var adjFaceColor = 0x0000ff;
+							var farFaceColor = 0xffffff;
+							var selFaceColor = 0xff0000;
+							for (var i = 0; i < geometry.faces.length; i++) {
+								face = geometry.faces[i];
+								if (set.has(face.a + 1) && set.has(face.b + 1) && set.has(face.c + 1)) {
+									if (face.color === undefined) {
+									face.color = new THREE.Color(adjFaceColor);
+									}
+									else {
+										face.color.setHex(adjFaceColor);
+									}
+								}
+								else if (face.color === undefined) {
+									face.color = new THREE.Color(farFaceColor);
+								}
+								else {
+									face.color.setHex(farFaceColor);
+								}
+							}
+							geometry.colorsNeedUpdate = true;
+						}
+					}
+				} );
+			}
+			set.forEach(function ( id ){
+				var _geometry = new THREE.BoxGeometry( cubeSize, cubeSize, cubeSize );
+				var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+				var cube = new THREE.Mesh( _geometry, material );
+				cube.translateX ( geometry.vertices[id - 1].x );
+				cube.translateY ( geometry.vertices[id - 1].y );
+				cube.translateZ ( geometry.vertices[id - 1].z );
+				editor.result[cube.uuid] = cube;
+				scene.add( cube );
+			});
+
+			render();
+
+		} catch ( error ) {
+
+			alert("Invalid input");
+			return;
+
+		}
+	});
+
+	signals.showRegionRelaxed.add( function ( text ) {
+		try {
+
+			var list = JSON.parse( text );
+			var set = new Set(list);
+
+			editor.clearResult();
+			var scene = editor.scene;
+
+			for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
+
+				var object = scene.children[ i ];
+
+
+				object.traverse( function ( object ) {
+
+					if ( object instanceof THREE.Mesh ) {
+						geometry = object.geometry;
+						if (geometry instanceof THREE.BufferGeometry) {
+							object.visible = false;
+						}
+						else if (geometry instanceof THREE.Geometry){
+							object.visible = true;
+
+							var adjFaceColor = 0x0000ff;
+							var farFaceColor = 0xffffff;
+							var selFaceColor = 0xff0000;
+							for (var i = 0; i < geometry.faces.length; i++) {
+								face = geometry.faces[i];
+								var count = 0;
+								if (set.has(face.a + 1)) count++;
+								if (set.has(face.b + 1)) count++;
+								if (set.has(face.c + 1)) count++;
+								if (count >= 2) {
+									if (face.color === undefined) {
+									face.color = new THREE.Color(adjFaceColor);
+									}
+									else {
+										face.color.setHex(adjFaceColor);
+									}
+								}
+								else if (face.color === undefined) {
+									face.color = new THREE.Color(farFaceColor);
+								}
+								else {
+									face.color.setHex(farFaceColor);
+								}
+							}
+							set.forEach(function ( id ){
+								var _geometry = new THREE.BoxGeometry( cubeSize, cubeSize, cubeSize );
+								var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+								var cube = new THREE.Mesh( _geometry, material );
+								cube.translateX ( geometry.vertices[id - 1].x );
+								cube.translateY ( geometry.vertices[id - 1].y );
+								cube.translateZ ( geometry.vertices[id - 1].z );
+								editor.result[cube.uuid] = cube;
+								scene.add( cube );
+							});
+							geometry.colorsNeedUpdate = true;
+						}
+					}
+				} );
+			}
+
+			render();
+
+		} catch ( error ) {
+
+			alert("Invalid input");
+			return;
+
+		}
+	});
+
+	signals.runICP.add( function ( maxIterations, LOG ) {
+		var icp = new ICP();
+		object = editor.scene.children[1];
+		object.traverse( function (child) {
+			if ( child instanceof THREE.Mesh ) {
+				var geometry = child.geometry;
+				if (geometry instanceof THREE.Geometry) {
+					icp.loadSource(geometry.vertices);
+				}
+			}
+		});
+		object = editor.scene.children[2];
+		object.traverse( function (child) {
+			if ( child instanceof THREE.Mesh ) {
+				var geometry = child.geometry;
+				if (geometry instanceof THREE.Geometry) {
+					icp.loadTarget(geometry.vertices);
+				}
+			}
+		});
+		if (icp.source === undefined || icp.target === undefined) {
+				alert("File has not loaded");
+				return;
+		}
+		var iterations = parseInt(maxIterations)
+		if (isNaN(iterations)) {
+				alert("iteration is not a number");
+				return;
+		}
+		icp.ICP(iterations);
+		LOG.setValue(icp.log);
+	});
 
 	signals.transformModeChanged.add( function ( mode ) {
 
