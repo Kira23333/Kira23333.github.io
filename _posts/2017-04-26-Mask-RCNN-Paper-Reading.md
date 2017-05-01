@@ -3,13 +3,13 @@ layout: post
 title: Mask R-CNN
 date: 2017-04-26
 categories: blog
-tags: [Paper]
+tags: [Paper,Deep Learning,R-CNN,Mask R-CNN]
 description:
 ---
 
 # 4.26 Talk
 ## Classification:
-* CNN vs. edge detector(后者会被欺骗纯轮廓，CNN可以做到human-performance)
+* CNN vs. edge detector(后者会被纯轮廓欺骗，CNN可以做到human-performance)
 
 ## Detection:
 * Problem
