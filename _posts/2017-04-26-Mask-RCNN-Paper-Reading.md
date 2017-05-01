@@ -1,17 +1,17 @@
 ---
 layout: post
-title: Mask R-CNN Paper Reading
+title: Mask R-CNN
 date: 2017-04-26
 categories: blog
 tags: [Paper]
 description:
 ---
 
-
-# Classification:
+# 4.26 Talk
+## Classification:
 * CNN vs. edge detector(后者会被欺骗纯轮廓，CNN可以做到human-performance)
 
-# Detection:
+## Detection:
 * Problem
   * High efficiency
 
@@ -28,7 +28,7 @@ description:
     * Region Proposal net
       * Multiple scales/ratios/anchors
 
-# Instance Segmentation
+## Instance Segmentation
 * Mask R-CNN
   * new task with Fast R-CNN: Mask regression
   * ROI Align?
