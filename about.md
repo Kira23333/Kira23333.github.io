@@ -7,7 +7,7 @@ header-img: "img/green.jpg"
 ## 我是谁
 
 <center>
-    <p><img src="img/ceng_small.jpg" align="center"></p>
+    <p><img src="https://raw.githubusercontent.com/Kira23333/Kira23333.github.io/master/img/ceng_small.jpg" align="center"></p>
 </center>
 
 曾华，学渣一枚，来自五道口男子职业技术学院，工学硕士在读，在渲染组研究深度学习
