@@ -3,7 +3,7 @@ layout: post
 title: 机壳（ke?qiao?）机动队
 date: 2017-04-09
 categories: blog
-tags: [影评,机壳机动队]
+tags: [影评,机壳机动队,评论]
 description: 终于开始写影评了，奇异博士对不起，金刚狼对不起，金刚对不起
 ---
 

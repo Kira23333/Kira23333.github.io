@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 日更，你信吗
-date: 2017-04-02
+date: 
 categories: blog
 tags: [随笔]
 description: 开一个坑，每天300字的随笔
