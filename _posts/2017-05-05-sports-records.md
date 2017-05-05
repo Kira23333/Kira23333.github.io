@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 运动记录
-date: 
+date: 2017-05-05
 categories: blog
 tags: [运动,篮球,健身]
 description: 终于开始做运动记录了
