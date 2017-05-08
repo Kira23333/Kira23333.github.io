@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Guardians of the galaxy 2
+title: 银河护卫队2
 date: 2017-05-08
 categories: blog
 tags: [银河护卫队2,影评,评论]
