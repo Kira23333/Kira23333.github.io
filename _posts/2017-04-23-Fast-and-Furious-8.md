@@ -3,7 +3,7 @@ layout: post
 title: Fast and Furious 8
 date: 2017-04-23
 categories: blog
-tags: [速度与激情,影评,评论]
+tags: [电影,速度与激情,影评,评论,自动驾驶]
 description: 激8影评
 ---
 

@@ -3,7 +3,7 @@ layout: post
 title: 银河护卫队2
 date: 2017-05-08
 categories: blog
-tags: [银河护卫队2,影评,评论]
+tags: [电影,银河护卫队2,影评,评论]
 description: 没第一部好看
 ---
 
