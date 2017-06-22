@@ -1,0 +1,55 @@
+ [ {
+    "name": "/",
+    "parent": "null",
+    "children": [
+      {
+        "name": "*",
+        "parent": "/",
+        "children": [
+          {
+            "name": "A",
+            "parent": "/"
+          },
+          {
+            "name": "*",
+            "parent": "/",
+			"children": [
+				{
+					"name": "1",
+					"parent": "*"
+				},
+				{
+					"name": "^",
+					"parent": "*",
+					"children": [
+						{
+							"name": "R",
+							"parent": "^"
+						},
+						{
+							"name": "n",
+							"parent": "^"
+						}
+					]
+				}
+			]
+          }
+        ]
+      },
+      {
+        "name": "*",
+        "parent": "/",
+		"children": [
+			{
+				"name": "1",
+				"parent": "."
+			},
+			{
+				"name": "R",
+				"parent": "*"
+			}
+		]
+      }
+    ]
+  }
+]
